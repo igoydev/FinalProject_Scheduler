@@ -6,9 +6,13 @@
 //
 
 #include <iostream>
+#include "Index.h"
 using namespace std;
 
 int main() {
+    
+    load();
+    login();
     
     return 0;
 }
