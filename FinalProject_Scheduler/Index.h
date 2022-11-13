@@ -27,6 +27,15 @@ void editSchedule();
 void add_schedule();
 void matchSchedule();
 
+void save() {
+    ofstream myFile("Schedule.txt", ios::trunc);
+  
+    for (int i = 0; i < date.size(); i++)
+    {
+        myFile << "\n" << date[i] << "," << hours[i] << "," << activity[i];
+    }
+    myFile.close();
+}
 
 void load() {
     
@@ -76,7 +85,7 @@ void menu() {
     case'1':
         dashboard();
     case'2':
-        add_schedule();
+        editSchedule();
     case'3':
         matchSchedule();
     case 'E':
@@ -103,7 +112,7 @@ void dashboard()
     cout << "Today is : " << dt <<endl<<endl;
     
     
-    cout << setw(4) << left << "No " << setw(17) << left << "|Date" << "|Hours" << setw(21) << "|Activity" <<"|" << endl;
+    cout << setw(4) << left << "No " << setw(17) << left << "|Date" << "|Hours" << setw(15) << "|Activity" <<"|" << endl;
     
     
     for (int i = 0; i < date.size(); i++) {
@@ -149,9 +158,56 @@ void login()
 
 void editSchedule()
 {
-    cout << "==========================================\n";
-    cout << "||              EDIT SCHEDULE           ||\n";
-    cout << "==========================================\n";
+    int choice;
+    char choice2;
+    string input;
+    beginning:
+  
+    header();
+    cout << setw(4) << left << "No " << setw(12) << left << "|Date" << "|Hours" << setw(17) << "|Activity" <<"|" << endl;
+    for (int i = 0; i < date.size(); i++) {
+        cout << setw(3) << right << i + 1 << ".|" << setw(11) << left << date[i] << "|" << setw(5) << left << hours[i] << "|" << setw(16)<< activity[i] << "|" << endl;
+    }
+    cout << "Select item number (1-" << date.size() << "): ";
+    cin >> choice;
+    choice--;
+
+    invalid:
+    cout << setw(3) << right << choice + 1 << ".|" << setw(22) << left << date[choice] << "|" << setw(5) << right << hours[choice] << "|" << setw(7) << activity[choice] << "|" << endl;
+    cout << "\nWhat do you want to edit? \nN/n Name\nP/p Price\nS/s stock\nD/d Delete item\nB/b Back\nYour choice: ";
+    cin >> choice2;
+    if (choice2 == 'N' || choice2 == 'n') {
+        cout << "\nEnter new date (DD/MM/YYYY): ";
+        cin.ignore();
+        getline(cin, date[choice]);
+    }
+    else if (choice2 == 'P' || choice2 == 'p') {
+        cout << "\nEnter new time: ";
+        cin >> input;
+        hours[choice] = input;
+    }
+    else if (choice2 == 'S' || choice2 == 's') {
+        cout << "\nEnter new activity: ";
+        cin >> input;
+        activity[choice] = input;
+    }
+    else if (choice2 == 'D' || choice2 == 'd') {
+        date.erase(date.begin() + choice);
+        hours.erase(hours.begin() + choice);
+        activity.erase(activity.begin() + choice);
+    }
+    else if (choice2 == 'B' || choice2 == 'b') {
+        save();
+    menu();
+
+    }
+    //go back
+    else {
+        system("CLS");
+        header();
+        goto invalid;
+    }
+    goto beginning;
 }
 
 void add_schedule() {
