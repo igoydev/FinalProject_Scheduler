@@ -2,6 +2,7 @@
 #define Index_h
 
 #include <iostream>
+#include <algorithm>
 #include <fstream>   //for file manipulation
 #include <stdlib.h>  //for clear screen, exit
 #include <iomanip>   //for whitespace etc
@@ -268,8 +269,21 @@ void add_schedule()
     dashboard();
 }
 
+int findSmallest(int a, int b, int c)
+{
+    if (a <= b && a <= c)
+        return a;
+    else if (b <= a && b <= c)
+        return b;
+
+    else
+        return c;
+}
+
 void matchSchedule()
 {
+    int N = date.size();
+
     struct schedule_request
     {
         string nameReq, dateReq;
@@ -278,75 +292,89 @@ void matchSchedule()
 
     schedule_request listReq;
 
-    cout << "Mau janji sama siapa nih?" << endl;
-    cin >> listReq.nameReq;
-    cout << endl;
+    struct Index
+    {
+        string nameIndex, dateIndex;
+        double startHours, endHours;
+    };
 
-    cout << "Mau tanggal berapa? (DD/MM/YYYY)" << endl;
-    cin >> listReq.dateReq;
-    cout << endl;
-
-    cout << "Mau mulai jam berapaa?" << endl;
-    cin >> listReq.hoursReqS;
-    cout << endl;
+    Index structIndex[date.size()];
 
     for (int i = 0; i < date.size(); i++)
     {
-        if (listReq.nameReq == name[i])
+        structIndex[i].nameIndex = name[i];
+        structIndex[i].dateIndex = date[i];
+        structIndex[i].startHours = hours[i];
+        structIndex[i].endHours = hoursEnd[i];
+    }
+
+    for (int i = 0; i < date.size() - 1; i++)
+    {
+        for (int j = i + 1; j < date.size(); j++)
         {
-            if (listReq.dateReq == date[i])
+            Index temp = structIndex[j];
+            structIndex[j] = structIndex[i];
+            structIndex[i] = temp;
+        }
+    }
+
+    for (int i = 0; i < date.size(); i++)
+    {
+        cout << structIndex[i].nameIndex << " "
+             << structIndex[i].dateIndex << " "
+             << structIndex[i].startHours << " "
+             << structIndex[i].endHours << " "
+             << endl;
+    }
+
+    cout << "Who do you want to make an appointment with?" << endl;
+    cin >> listReq.nameReq;
+    cout << endl;
+
+    cout << "What date do you want to make an appointment? (DD/MM/YYYY)" << endl;
+    cin >> listReq.dateReq;
+    cout << endl;
+
+    cout << "What time do you want to make an appointment?" << endl;
+    cin >> listReq.hoursReqS;
+    cout << endl;
+
+    int x = 0;
+    int y = 0;
+    int z = 0;
+
+    cout << "Mathcing..." << endl
+         << endl;
+
+    for (int i = 0; i < date.size(); i++)
+    {
+        if (listReq.nameReq == structIndex[i].nameIndex)
+        {
+            if (listReq.dateReq == structIndex[i].dateIndex)
             {
-                if (listReq.hoursReqS < hours[i])
+                if (listReq.hoursReqS < structIndex[i].startHours)
                 {
-                    cout
-                        << "Bisa nih bikin janji jam segini tapi dia ada acara lagi dari jam "
-                        << hours[i] << " sampai " << hoursEnd[i] << " yaaa" << endl;
-                    break;
+                    cout << "In his/her database, " << listReq.nameReq
+                         << " is free but " << listReq.nameReq
+                         << " have a schedule at " << structIndex[i].startHours
+                         << ". Please contact them for confirmation!" << endl;
+                    x++;
                 }
-                else if (listReq.hoursReqS > hoursEnd[i])
+                else if (listReq.hoursReqS > structIndex[i].startHours && listReq.hoursReqS < structIndex[i].endHours)
                 {
-                    if (listReq.hoursReqS > hours[i + 1] && listReq.hoursReqS < hours[i + 1])
-                    {
-                        cout << "Yah:( dia lagi gak bisa nih kalo jam segituu" << endl;
-                    }
-                    // if (i == date.size() - 1){
-                    //     cout << "Bisa nih bikin janji jam segini" << endl;
-                    //     break;
-                    // } else {
-                    //     cout << "Bisa nih bikin janji jam segini tapi "
-                    //     << listReq.nameReq << " ada janji lain di jam "
-                    //     << hours[i + 1] << endl;
-                    //     break;
-                    // }
-                    if (i == date.size() - 1)
-                    {
-                        cout << "Kosong terus" << endl;
-                        break;
-                    }
-                    else
-                    {
-                        if (listReq.hoursReqS < hours[i + 1])
-                        {
-                            cout
-                                << "Bisa nih bikin janji jam segini tapi dia ada acara lagi dari jam "
-                                << hours[i + 1] << " yaaa" << endl;
-                            break;
-                        }
-                        else if (listReq.hoursReqS > hours[i + 1] && listReq.hoursReqS < hours[i + 1])
-                        {
-                            cout << "Yah:( dia lagi gak bisa nih kalo jam segituu" << endl;
-                        }
-                    }
+                    cout << "Couldn't make appointment with " << listReq.nameReq
+                         << " at this time." << endl;
+                    y++;
                 }
-                else
+                else if (listReq.hoursReqS > structIndex[i].endHours)
                 {
-                    cout << "Yah:( dia lagi gak bisa nih kalo jam segituu" << endl;
-                    break;
+                    cout << "He/She is free! Please contact them for confirmation incase they have a new schedule!" << endl;
+                    z++;
                 }
             }
             else
             {
-                cout << "Dia lagi gak sibuk kok, aman!" << endl;
+                cout << "He's free!" << endl;
                 break;
             }
         }
@@ -354,6 +382,15 @@ void matchSchedule()
         {
             continue;
         }
+    }
+
+    cout << endl;
+
+    if (y != 0)
+    {
+        cout << "Final Schedule Matcher's Result : "
+             << "Couldn't make appointment with " << listReq.nameReq
+             << " at this time." << endl;
     }
 }
 
