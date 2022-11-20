@@ -269,17 +269,6 @@ void add_schedule()
     dashboard();
 }
 
-int findSmallest(int a, int b, int c)
-{
-    if (a <= b && a <= c)
-        return a;
-    else if (b <= a && b <= c)
-        return b;
-
-    else
-        return c;
-}
-
 void matchSchedule()
 {
     int N = date.size();
@@ -316,15 +305,6 @@ void matchSchedule()
             structIndex[j] = structIndex[i];
             structIndex[i] = temp;
         }
-    }
-
-    for (int i = 0; i < date.size(); i++)
-    {
-        cout << structIndex[i].nameIndex << " "
-             << structIndex[i].dateIndex << " "
-             << structIndex[i].startHours << " "
-             << structIndex[i].endHours << " "
-             << endl;
     }
 
     cout << "Who do you want to make an appointment with?" << endl;
